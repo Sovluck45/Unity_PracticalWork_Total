@@ -521,7 +521,18 @@ public static class MVRProjectSetup
 
         CreateARRig(arPlacementPrefab, placementParticles);
 
-        UnityEngine.AI.NavMeshBuilder.BuildNavMesh();
+    var surface = GameObject.FindAnyObjectByType<UnityEngine.AI.NavMeshSurface>();
+    if (surface != null)
+    {
+        surface.BuildNavMesh();
+    }
+    else
+    {
+        Debug.LogWarning("NavMeshSurface not found in scene. Creating one...");
+        GameObject navObj = new GameObject("NavMeshSurface");
+        var newSurface = navObj.AddComponent<UnityEngine.AI.NavMeshSurface>();
+        newSurface.BuildNavMesh();
+    }
 
         EditorSceneManager.SaveScene(scene, ScenesPath + "/GameScene.unity");
     }
