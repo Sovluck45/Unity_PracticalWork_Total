@@ -187,12 +187,13 @@ public static class MVRProjectSetup
         if (existing != null)
             return existing;
 
-        GameObject root = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        root.name = "Player";
-        root.tag = "Player";
+    GameObject root = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+    root.name = "Player";
+    root.tag = "Player";
 
-        Rigidbody rb = root.GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+    Rigidbody rb = root.AddComponent<Rigidbody>(); 
+
+    rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
         CapsuleCollider capsule = root.GetComponent<CapsuleCollider>();
         if (capsule != null)
