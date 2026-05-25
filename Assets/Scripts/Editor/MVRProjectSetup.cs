@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using System.IO;
 using Mirror;
+using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using Unity.XR.CoreUtils;
@@ -224,7 +224,7 @@ public static class MVRProjectSetup
 
         Rigidbody rb = root.AddComponent<Rigidbody>();
         rb.isKinematic = true;
-        root.AddComponent<NavMeshAgent>();
+        root.AddComponent<UnityEngine.AI.NavMeshAgent>();
         root.AddComponent<EnemyAI>();
 
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
@@ -521,7 +521,7 @@ public static class MVRProjectSetup
 
         CreateARRig(arPlacementPrefab, placementParticles);
 
-    var surface = GameObject.FindAnyObjectByType<UnityEngine.AI.NavMeshSurface>();
+    var surface = GameObject.FindAnyObjectByType<Unity.AI.Navigation.NavMeshSurface>();
     if (surface != null)
     {
         surface.BuildNavMesh();
@@ -530,7 +530,7 @@ public static class MVRProjectSetup
     {
         Debug.LogWarning("NavMeshSurface not found in scene. Creating one...");
         GameObject navObj = new GameObject("NavMeshSurface");
-        var newSurface = navObj.AddComponent<UnityEngine.AI.NavMeshSurface>();
+        var newSurface = navObj.AddComponent<Unity.AI.Navigation.NavMeshSurface>();
         newSurface.BuildNavMesh();
     }
 
