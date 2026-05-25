@@ -1,0 +1,47 @@
+---
+description: Unity AR Multiplayer — Mirror, AR Foundation, UI и сборка Android
+alwaysApply: true
+---
+
+# Unity AR Multiplayer Project Rules
+
+## Code Style
+
+- Сетевые методы для UI-кнопок: `public void`
+- Имя файла = имя класса (без пробелов)
+- Приватные поля в Inspector: `[SerializeField]`
+- Менеджеры: Singleton + `DontDestroyOnLoad`
+
+```csharp
+// ✅ Command только от локального игрока
+if (!isLocalPlayer) return;
+CmdPlaceObject(hit.pose.position);
+```
+
+## Mirror Networking
+
+- Перед `Command` всегда проверять `isLocalPlayer`
+- `SyncVar` — только для часто обновляемых данных
+- `NetworkIdentity` — только на root префаба
+
+## AR Foundation
+
+- Перед использованием AR проверять `ARSession.state`
+- `ARPlaneManager` отключать, когда не нужен (производительность)
+- Raycast: `TrackableType.PlaneWithinPolygon`
+
+```csharp
+if (ARSession.state != ARSessionState.SessionTracking) return;
+```
+
+## UI
+
+- `LoginPanel` — активна при старте
+- `GamePanel` — неактивна при старте
+- У всех кнопок должны быть OnClick-события
+
+## Build (Android)
+
+- Target: Android API 29
+- IL2CPP + ARM64 обязательно
+- Internet Access: Auto

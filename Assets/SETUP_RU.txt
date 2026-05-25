@@ -1,0 +1,125 @@
+ПРАКТИЧЕСКИЕ РАБОТЫ 1–5 — ИНСТРУКЦИЯ ПО ЗАПУСКУ (Unity 6.4)
+================================================================
+
+БЫСТРЫЙ СТАРТ
+-------------
+1. Откройте проект в Unity 6.4.
+2. Дождитесь импорта пакетов (Mirror через OpenUPM, AR Foundation 6.1).
+3. Меню MVR (НЕ внутри Package Management):
+   - верхняя строка: MVR > Setup Full Project
+   - или: Window > MVR > Setup Full Project (прокрутите список Window вниз)
+4. Если красные ошибки — см. раздел «Устранение ошибок» ниже.
+5. Откройте Assets/Scenes/MainMenu.unity и нажмите Play.
+
+УСТРАНЕНИЕ ОШИБОК
+-----------------
+Mirror: Git URL НЕ работает (нет package.json в репозитории).
+  Mirror ставится через OpenUPM (уже в Packages/manifest.json).
+  Package Manager > In Project > com.mirrornetworking.mirror
+
+Если Mirror/AR не ставятся:
+  1. Закройте Unity
+  2. Удалите папку Library в корне проекта
+  3. Откройте проект снова и дождитесь импорта
+
+AR Foundation: нужна версия 6.1+ для Unity 6.4 + URP 17 (в manifest уже 6.1.0).
+
+СТРУКТУРА
+---------
+Assets/Scenes/MainMenu.unity, GameScene.unity
+Assets/Scripts/*.cs
+Assets/Prefabs/Player.prefab, Enemy.prefab, ARPlacementObject.prefab
+Assets/Animations/PlayerAnimator.controller
+Assets/Audio/*.wav
+Assets/Materials/ParticleMaterial.mat
+
+ПР №1 — 3D МОДЕЛИРОВАНИЕ
+-------------------------
+- ObjectSpawner на GameScene спавнит Plane/Capsule/Cube.
+- Рандом: позиция, масштаб, цвет (Renderer.material.color).
+- Логи: Debug.Log в консоли.
+
+ПР №2 — ФИЗИКА И NAVMESH
+------------------------
+- Ground = Plane, static.
+- Player: Rigidbody (Freeze Rotation X,Z), CapsuleCollider, PlayerController.
+- Enemy: Rigidbody (kinematic), BoxCollider, NavMeshAgent, EnemyAI.
+- NavMesh: после изменения уровня — Window > AI > Navigation > Bake.
+- WASD + Space (прыжок, isGrounded).
+
+ПР №3 — UI И СЦЕНЫ
+------------------
+- Canvas: Scale With Screen Size (1920x1080).
+- LoginPanel активна, GamePanel неактивна при старте.
+- MVRApp.SceneManager: DontDestroyOnLoad, Score, Health.
+- Host/Client -> OnConnected -> GamePanel + загрузка GameScene.
+
+INSPECTOR — КОМПОНЕНТЫ (если настраиваете вручную)
+---------------------------------------------------
+GameSystems:
+  - SceneManager (MVRApp)
+  - SoundManager: Music Source, SFX Source, clips из Audio/
+
+NetworkManager:
+  - Telepathy Transport, Port = 7777
+  - Player Prefab = Assets/Prefabs/Player.prefab
+  - Auto Create Player = включено
+  - Login Panel / Game Panel — ссылки на UI
+
+Player Prefab (root):
+  - Network Identity (только root)
+  - Network Transform
+  - DataPacketHandler
+  - PlayerController
+  - Rigidbody, CapsuleCollider, Animator
+
+Enemy Prefab:
+  - Rigidbody, BoxCollider, NavMeshAgent, EnemyAI
+
+AR Session Origin:
+  - AR Session Origin, AR Plane Manager, AR Raycast Manager
+
+ARController:
+  - Raycast Manager, Plane Manager, Placement Prefab, Placement Particles
+
+ONCLICK — КНОПКИ
+----------------
+HostButton   -> NetworkManager.StartHost
+ClientButton -> NetworkManager.StartClient
+MenuButton   -> UIManager.OnMenuButton
+
+BUILD SETTINGS (Android)
+------------------------
+File > Build Settings > Android > Switch Platform
+Player Settings > Android:
+  - Minimum API Level: 24
+  - Target API Level: 29
+  - Scripting Backend: IL2CPP
+  - Target Architectures: ARM64
+  - Internet Access: Auto (Force Internet Permission включён)
+
+XR PLUGIN MANAGEMENT
+--------------------
+Edit > Project Settings > XR Plug-in Management > Android:
+  - Install ARCore (через Package Manager: ARCore XR Plugin)
+  - Включить ARCore в списке plug-in providers
+
+ПРОВЕРКА КОМПИЛЯЦИИ
+-------------------
+1. Window > General > Console — нет красных ошибок.
+2. После установки Mirror: дождитесь окончания импорта.
+3. Если NetworkTransform не найден — на Player используйте компонент Network Transform из Mirror.
+
+ТЕСТ ФУНКЦИОНАЛА
+----------------
+1. Play в MainMenu: видна LoginPanel.
+2. Host: GamePanel, загрузка GameScene, спавн Player.
+3. WASD — движение; Space — прыжок + анимация + звук.
+4. Тап/клик — AR размещение (на устройстве с ARCore), +10 Score.
+5. Enemy преследует Player по NavMesh.
+6. Menu — Disconnect, возврат LoginPanel и MainMenu.
+
+ПРИМЕЧАНИЕ ПО AR FOUNDATION
+---------------------------
+Unity 6 использует AR Foundation 6.x (совместимый API: ARSession, ARRaycastManager,
+TrackableType.PlaneWithinPolygon). На ПК Editor AR-трекинг ограничен — полный тест на Android.
